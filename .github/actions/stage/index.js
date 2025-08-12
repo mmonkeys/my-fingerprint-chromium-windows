@@ -63,6 +63,25 @@ async function run() {
                 await new Promise(r => setTimeout(r, 10000));
             }
         }
+
+        await exec.exec('7z', ['a', '-tzip', 'C:\\ungoogled-chromium-windows\\artifacts.zip',
+            'C:\\ungoogled-chromium-windows', '-mx=3', '-mtc=on'], {ignoreReturnCode: true});
+        for (let i = 0; i < 5; ++i) {
+            try {
+                await artifact.deleteArtifact(artifactName);
+            } catch (e) {
+                // ignored
+            }
+            try {
+                await artifact.uploadArtifact(artifactName, ['C:\\ungoogled-chromium-windows\\artifacts.zip'],
+                    'C:\\ungoogled-chromium-windows', {retentionDays: 1, compressionLevel: 0});
+                break;
+            } catch (e) {
+                console.error(`Upload artifact failed: ${e}`);
+                // Wait 10 seconds between the attempts
+                await new Promise(r => setTimeout(r, 10000));
+            }
+        }
     } else {
         await new Promise(r => setTimeout(r, 5000));
         await exec.exec('7z', ['a', '-tzip', 'C:\\ungoogled-chromium-windows\\artifacts.zip',

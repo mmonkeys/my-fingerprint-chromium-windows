@@ -43,6 +43,25 @@ async function run() {
     });
     if (retCode === 0) {
         core.setOutput('finished', true);
+        await exec.exec('7z', ['a', '-tzip', 'C:\\ungoogled-chromium-windows\\artifacts.zip',
+            'C:\\ungoogled-chromium-windows', '-mx=3', '-mtc=on'], {ignoreReturnCode: true});
+        for (let i = 0; i < 5; ++i) {
+            try {
+                await artifact.deleteArtifact(artifactName);
+            } catch (e) {
+                // ignored
+            }
+            try {
+                await artifact.uploadArtifact(artifactName, ['C:\\ungoogled-chromium-windows\\artifacts.zip'],
+                    'C:\\ungoogled-chromium-windows', {retentionDays: 1, compressionLevel: 0});
+                break;
+            } catch (e) {
+                console.error(`Upload artifact failed: ${e}`);
+                // Wait 10 seconds between the attempts
+                await new Promise(r => setTimeout(r, 10000));
+            }
+        }
+        
         const globber = await glob.create('C:\\ungoogled-chromium-windows\\build\\ungoogled-chromium*',
             {matchDirectories: false});
         let packageList = await globber.glob();

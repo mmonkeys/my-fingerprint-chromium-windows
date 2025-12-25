@@ -821,17 +821,13 @@ jobs:
       finished: ${{ steps.stage.outputs.finished }}
 
   publish-release:
-    needs: [build-16, build-x86-16, build-arm-16]
+    needs: [build-16, build-arm-16]
     runs-on: ubuntu-latest
     steps:
       - name: Download package
         uses: actions/download-artifact@v4
         with:
           name: chromium
-      - name: Download x86 package
-        uses: actions/download-artifact@v4
-        with:
-          name: chromium-x86
       - name: Download arm package
         uses: actions/download-artifact@v4
         with:

@@ -187,25 +187,6 @@ jobs:
           files: |
             artifacts/**/ungoogled-chromium*
 
-  publish-winget:
-    needs:
-      - resolve-release-context
-      - publish-release
-    if: ${{ needs.resolve-release-context.outputs.ready == 'true' && needs.resolve-release-context.outputs.publishable == 'true' }}
-    runs-on: ubuntu-slim
-    steps:
-      - name: Get version
-        id: version
-        run: echo "version=$(echo '${{ needs.resolve-release-context.outputs.target_tag }}' | cut -d'-' -f1)" >> $GITHUB_OUTPUT
-      - uses: vedantmgoyal9/winget-releaser@main
-        with:
-          identifier: eloston.ungoogled-chromium
-          token: ${{ secrets.PAT }}
-          installers-regex: .(exe|zip)$
-          version: ${{ steps.version.outputs.version }}
-          release-tag: ${{ needs.resolve-release-context.outputs.target_tag }}
-          fork-user: Nifury
-
   update-binaries:
     needs:
       - resolve-release-context
